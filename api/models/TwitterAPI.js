@@ -73,15 +73,8 @@ module.exports = {
                   type: 'tweets',
                   body: {
                     query: {
-                      regexp: { "keywords": keywordGl+".+" },
-                      regexp: { "keywords": ".+"+keywordGl },
-                      regexp: { "keywords": keywordGl }
-
-                      //wild card
-                      //wildcard: { "constituencyname": "+isbury" }
-
-                      //regular expression
-                      //regexp: { "constituencyname": ".+isb.+" } 
+                      match: { "keywords": keywordGl }
+                      
                     },
                   }
                 },function (error, response, status) {
@@ -130,6 +123,16 @@ module.exports = {
         }
       });
       
+    },
+
+    keyword: {
+        type : 'string'     
+    },
+    tweetCount: {
+        type : 'number'     
+    },
+    people: {
+        type : 'string'     
     }
 
 

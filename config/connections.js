@@ -66,7 +66,7 @@ module.exports.connections = {
      port: 27017,
      //user: 'username', //optional
      //password: 'password', //optional
-     database: 'mydb' //optional
+     database: 'twitter-analatics' //optional
    },
 
   /***************************************************************************

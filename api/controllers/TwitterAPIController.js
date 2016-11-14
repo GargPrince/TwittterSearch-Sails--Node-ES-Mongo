@@ -5,7 +5,6 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 var client=require('./../../config/database').client;
-var inputfile = require("./../../constituencies.json");
 module.exports = {
 	'new': function(req, res) {
         res.end("Hi Prince I am running");
@@ -17,15 +16,15 @@ module.exports = {
 },
 
 
-'search': function(req, res) {
+'search': function(keyword, cb) {
 
 client.search({
   index: 'twitter',
   type: 'tweets',
   body: {
-    fields : ["user.name"],
+    
     query: {
-      regexp: { "id_str": ".+65893185.+" }
+      match: { "keywords": "world cup" }
 
       //wild card
       //wildcard: { "constituencyname": "+isbury" }
@@ -40,24 +39,24 @@ client.search({
     }
     else {
       console.log("--- Response ---");
-      res.end(JSON.stringify(response));
+      //res.end(JSON.stringify(response));
       console.log("--- Hits ---");
-      response.hits.hits.forEach(function(hit){
-        console.log(hit);
-      })
+      cb(response.hits.hits);
     }
 });
 },
 
 'tweets': function(req, res) {
-  var tTweet;
-  var topTen;
-    TwitterAPI.attributes.tweets(req.params.all().words, function(response){
-      console.log('\n\n\nresponse for all'+JSON.stringify(response));
+  this.search(req.params.all().words, function(response){
+      res.render('displayTweets', {tweets: response});
+      //console.log('\n\n\nresponse for all'+JSON.stringify(response));
     });
+    // TwitterAPI.attributes.tweets(req.params.all().words, function(response){
+    //   res.render('displayTweets', {tweets: JSON.stringify(response)});
+    //   //console.log('\n\n\nresponse for all'+JSON.stringify(response));
+    // });
    
 
-//TwitterAPI.attributes.search(req.params.all().words);
 }
 
 
