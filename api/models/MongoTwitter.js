@@ -5,21 +5,3 @@
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
 
-module.exports = {
-
-  attributes: {
-   keyword: {
-        type : 'string'     
-    },
-    tweetCount: {
-        type : 'number'     
-    },
-    people: {
-        type : 'array'     
-    },
-    timestamp: {
-        type : 'date'
-    }
-  }
-};
-

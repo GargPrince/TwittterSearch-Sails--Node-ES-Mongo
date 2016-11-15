@@ -31,49 +31,53 @@ module.exports.routes = {
   * `assets` directory)                                                      *
   *                                                                          *
   ***************************************************************************/
-
+//API to show homepage
   '/': {
     view: 'index'
   },
 
   
-
-'/tweets': {
+//API to search tweets by the user
+'/searchTweets': {
     controller: 'TwitterAPIController',
-    action: 'tweets'
+    action: 'searchTweets'
   },
 
-'/allTweetsAPI': {
+//Show all tweets coint
+'/allTweetsAPICount': {
     controller: 'TwitterAPIController',
-    action: 'allTweetsAPI'
+    action: 'allTweetsAPICount'
   },
 
-'/search': {
-    controller: 'TwitterAPIController',
-    action: 'search'
-  },
-
+//API to show top ten people who tweeted most
 '/tenPeopleTwittedMost': {
     controller: 'TwitterAPIController',
     action: 'tenPeopleTwittedMost'
   },
 
-  
+  //API to show most Recent Tweets
 '/mostRecentTweets': {
     controller: 'TwitterAPIController',
     action: 'mostRecentTweets'
   },
 
+//API to show least Recent Tweets
   '/leastRecentTweets': {
     controller: 'TwitterAPIController',
     action: 'leastRecentTweets'
   },
 
+//API to Filter tweets by user who are having more followers
   '/sortByFollowers': {
     controller: 'TwitterAPIController',
     action: 'sortByFollowers'
-  }
+  },
 
+//API to show data present in mongoDB
+'/showMongoData': {
+    controller: 'TwitterAPIController',
+    action: 'showMongoData'
+  }
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *

@@ -1,9 +1,14 @@
+//Importing Packages
 var Promise = require('bluebird');
-var client=require('./../../config/database').client;
-var twitterClient = require('./../../config/database').twitterClient;
-var fs=require('fs');
-var writer= fs.createWriteStream(__dirname+'/../../sample.json');
+
+//Requirement for configuration of our databases and twitter api
+var config=require('./../../config/databaseConfig');
+var esClient=config.ESClient;
+var mongoClient=config.MongoClient;
+var twitterClient = config.twitterClient;
+
 var keywordGl='';
+var url = 'mongodb://localhost:27017/twitter'; //mongo URL : you can select your DB by replacing 'twitter' from this URL2
 
 /**
  * TwitterAPI.js
@@ -15,12 +20,15 @@ var keywordGl='';
 module.exports = {
   attributes: {
 
-    allTweetsAPI: function(cb) {
-              client.search({
+//Fetch all tweets from Elastic search
+    allTweetsAPI: function(callbackTweets) {
+              esClient.search({
                   index: 'twitter',
                   type: 'tweets',
                   body: {
-                    from:0, size:3000,
+                    //We defined the limit maximum records to be fetched from ES
+                    from:0, size:5000, 
+                    //query to get whole data inside index
                     query: {
                       match_all: {}
                       
@@ -28,42 +36,35 @@ module.exports = {
                   }
                 },function (error, response, status) {
                     if (error){
-                      console.log("search error: "+error)
+                      throw error;
                     }
                     else {
-                      console.log("\n\n\n\n--- Response ---"+JSON.stringify(response.hits.hits.length));
-                      //res.end(JSON.stringify(response));
-                      console.log("--- Hits ---");
-                      cb(response.hits.hits);
+                      callbackTweets(response.hits.hits);
                    
-                     
                     }
                 });
 },
 
-    tweets: function(keyword,cb) {
+//search for tweets from TWITTER API and storing in ES
+    searchTweets: function(keyword,dataByCallback) {
       var overallResponse = {};
       keywordGl=keyword;
       var promise=new Promise(function(resolve, reject){
+        //query by keyword to twitter API and limit count to 100
       twitterClient.get('search/tweets', {q: keyword, count: 100}, function(err, data){
         // console.log("success twitter"+ data.statuses);
         console.log('\n\n\n\nResponse twitter length--->'+ data.statuses.length);
         resolve(data.statuses);
         });
       });
-
+// Using promises instead of callbacks
       promise.then( function(res){
-
 
           var tweetObj = res;
           var bulk = [];
               var makebulk = function(tweetObj,callback){
-                  
+          //pushing into array        
                 for (var current in tweetObj){
-                   tweetObj[current]['keywords'] = keywordGl;
-                   tweetObj[current]['timeStamp'] = new Date();
-
-                  writer.write(JSON.stringify(tweetObj[current]));
                 bulk.push(
                   { index: {_index: 'twitter', _type: 'tweets', _id: tweetObj[current].id_str } }, JSON.stringify(tweetObj[current])
                 );
@@ -72,32 +73,30 @@ module.exports = {
             }
 
             var indexall = function(madebulk,callback) {
-              client.bulk({
+              esClient.bulk({
                 maxRetries: 5,
                 index: 'twitter',
                 type: 'tweets',
                 body: madebulk
               },function(err,resp,status) {
                   if (err) {
-                    console.log(err);
+                    throw err;
                   }
                   else {
                     callback(resp.items);
                   }
               });
             }
-
+// Calling makebulk to prepare our bulk array of JSON and query ES for bulk store by calling indexall()
             makebulk(tweetObj,function(response){
-              console.log("Bulk content prepared");
               indexall(response,function(response){
-                // console.log("Prince Status is: "+JSON.stringify(response));
-                
-                  console.log('keyword------>'+JSON.stringify(keywordGl));
-                  client.search({
+                  esClient.search({
                   index: 'twitter',
                   type: 'tweets',
                   body: {
+                    //We defined the limit maximum records to be fetched from ES
                     from:0, size:5000,
+                    //query by regexp to get different compbination of matching data for ES
                     query: {
                       regexp: { "text": ".+"+keywordGl+".+" },
                       regexp: { "text": keywordGl+".+" },
@@ -108,65 +107,45 @@ module.exports = {
                   }
                 },function (error, response, status) {
                     if (error){
-                      console.log("search error: "+error)
+                      throw error;
                     }
                     else {
-                      console.log("\n\n\n\n--- Response ---"+JSON.stringify(response.hits.hits.length));
-                      //res.end(JSON.stringify(response));
-                      console.log("--- Hits ---");
-                      cb(response.hits.hits);
-                   
-                     
+                      //giving data by callback
+                      dataByCallback(response.hits.hits);
                     }
                 });
-
-                
               });
             });
-
-
       
       });
       
     },
 
-    countTotalTweet : function(cb) {
-      client.count({index: 'twitter', type: 'tweets'},function(err,resp,status) {  
-        if(err) console.log(err.toString());
-        else if(!resp){
-          console.log("0 result")
-        }
-        else {
-          //This call back can do whatever we will pass to it. Multi purpose
-          cb(resp.count);
-        }
+//Query to save data in MongoDB
+    mongoDBSave: function(keyword, tweetCount) {
+      mongoClient.connect(url, function(err, db) {
+        db.collection('tweetinfo').insertOne( {
+      "keywords" : keyword,
+      "timeStamp" : new Date(),
+      "tweetCount" : tweetCount
+   }, function(err, result) {
+    if(err) throw err;
+    else if(!result) console.log("nO MONGO INSERTION");
+    else console.log("MONGO INSERTION");
+    db.close();
+  });
+    
       });
     },
+//Query to find data form MongoDB
+    showMongoData: function(mongoCallback) {
+      mongoClient.connect(url, function(err, db) {
+        db.collection('tweetinfo').find({}).toArray(function(err, items) {
+        mongoCallback(items);
+        db.close();
+        });
+    });
 
-    deleteDoc: function() {
-      this.countTotalTweet(function(count) {
-        if(count > 0) {
-          client.delete({  
-            index: 'twitter',
-            id: '1',
-            type: 'tweets'
-          },function(err,resp,status) {
-              console.log("Delete Complete");
-              console.log(resp);
-          });
-        }
-      });
-      
-    },
-
-    keyword: {
-        type : 'string'     
-    },
-    tweetCount: {
-        type : 'number'     
-    },
-    people: {
-        type : 'string'     
     }
 
 
