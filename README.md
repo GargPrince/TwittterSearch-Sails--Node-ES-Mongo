@@ -17,7 +17,7 @@ This is a Node JS app to demonstrate fetching of tweets from Twitter API and sto
 
 Once everything is set up, we can fetch tweets from Twitter API and store in Elastic Search and Analytics in Mongo DB.
 
-## Using Routs
+## API Routes
 
 1. To search Tweets by Twitter API
 
