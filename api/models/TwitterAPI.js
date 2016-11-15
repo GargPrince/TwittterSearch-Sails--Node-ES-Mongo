@@ -50,10 +50,8 @@ module.exports = {
       var overallResponse = {};
       keywordGl=keyword;
       var promise=new Promise(function(resolve, reject){
-        //query by keyword to twitter API and limit count to 100
-      twitterClient.get('search/tweets', {q: keyword, count: 100}, function(err, data){
-        // console.log("success twitter"+ data.statuses);
-        console.log('\n\n\n\nResponse twitter length--->'+ data.statuses.length);
+        //query by keyword to twitter API and limit count to 50
+      twitterClient.get('search/tweets', {q: keyword, count: 50}, function(err, data){
         resolve(data.statuses);
         });
       });
@@ -129,9 +127,6 @@ module.exports = {
       "timeStamp" : new Date(),
       "tweetCount" : tweetCount
    }, function(err, result) {
-    if(err) throw err;
-    else if(!result) console.log("nO MONGO INSERTION");
-    else console.log("MONGO INSERTION");
     db.close();
   });
     

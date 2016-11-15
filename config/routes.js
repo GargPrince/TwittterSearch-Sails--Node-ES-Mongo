@@ -36,38 +36,31 @@ module.exports.routes = {
     view: 'index'
   },
 
-  
-//API to search tweets by the user
-'/searchTweets': {
-    controller: 'TwitterAPIController',
-    action: 'searchTweets'
-  },
-
-//Show all tweets coint
+//API to show tweet counts present in ES
 '/allTweetsAPICount': {
     controller: 'TwitterAPIController',
     action: 'allTweetsAPICount'
   },
 
-//API to show top ten people who tweeted most
+//API to show top ten people who tweeted most from ES
 '/tenPeopleTwittedMost': {
     controller: 'TwitterAPIController',
     action: 'tenPeopleTwittedMost'
   },
 
-  //API to show most Recent Tweets
+  //API to show most Recent Tweets from ES
 '/mostRecentTweets': {
     controller: 'TwitterAPIController',
     action: 'mostRecentTweets'
   },
 
-//API to show least Recent Tweets
+//API to show least Recent Tweets from ES
   '/leastRecentTweets': {
     controller: 'TwitterAPIController',
     action: 'leastRecentTweets'
   },
 
-//API to Filter tweets by user who are having more followers
+//API to Filter tweets by user who are having more followers from ES
   '/sortByFollowers': {
     controller: 'TwitterAPIController',
     action: 'sortByFollowers'
