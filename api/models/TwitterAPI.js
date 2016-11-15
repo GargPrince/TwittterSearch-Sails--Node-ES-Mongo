@@ -50,7 +50,7 @@ module.exports = {
       var overallResponse = {};
       keywordGl=keyword;
       var promise=new Promise(function(resolve, reject){
-        //query by keyword to twitter API and limit count to 50
+        //query by keyword to twitter API and limit count to 50 but you can keep it till 100(further than that not allowed)
       twitterClient.get('search/tweets', {q: keyword, count: 50}, function(err, data){
         resolve(data.statuses);
         });

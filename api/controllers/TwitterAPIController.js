@@ -13,10 +13,16 @@ module.exports = {
 //Save keyword timestamp and result count in MongoDB
 'searchTweets': function(req, res) {
     //call function present in TwitterAPI model for querying
+    //check if user requested by keyword
+    if(req.params.all().words) {
   TwitterAPI.attributes.searchTweets(req.params.all().words, function(response){
         TwitterAPI.attributes.mongoDBSave(req.params.all().words, response.length);
       res.render('displayTweets', {tweets: response});
     });
+    }
+    else {
+        res.render("404"); //otherwise, 404
+    }
 
 },
 
@@ -25,7 +31,7 @@ module.exports = {
 'allTweetsAPICount' : function(req, res) {
     //call function present in TwitterAPI model for querying
   TwitterAPI.attributes.allTweetsAPI(function(tweets) {
-    res.end(tweets.length);
+    res.end(tweets.length.toString());
   });
 },
 
