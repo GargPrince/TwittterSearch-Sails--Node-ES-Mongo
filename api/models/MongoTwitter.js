@@ -15,7 +15,10 @@ module.exports = {
         type : 'number'     
     },
     people: {
-        type : 'string'     
+        type : 'array'     
+    },
+    timestamp: {
+        type : 'date'
     }
   }
 };

@@ -43,14 +43,36 @@ module.exports.routes = {
     action: 'tweets'
   },
 
-
+'/allTweetsAPI': {
+    controller: 'TwitterAPIController',
+    action: 'allTweetsAPI'
+  },
 
 '/search': {
     controller: 'TwitterAPIController',
     action: 'search'
   },
 
+'/tenPeopleTwittedMost': {
+    controller: 'TwitterAPIController',
+    action: 'tenPeopleTwittedMost'
+  },
 
+  
+'/mostRecentTweets': {
+    controller: 'TwitterAPIController',
+    action: 'mostRecentTweets'
+  },
+
+  '/leastRecentTweets': {
+    controller: 'TwitterAPIController',
+    action: 'leastRecentTweets'
+  },
+
+  '/sortByFollowers': {
+    controller: 'TwitterAPIController',
+    action: 'sortByFollowers'
+  }
 
   /***************************************************************************
   *                                                                          *

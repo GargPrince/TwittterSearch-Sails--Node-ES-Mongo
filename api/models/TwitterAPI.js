@@ -15,8 +15,48 @@ var keywordGl='';
 module.exports = {
   attributes: {
 
-    elasticStore: function(tweetObj) {
-              var bulk = [];
+    allTweetsAPI: function(cb) {
+              client.search({
+                  index: 'twitter',
+                  type: 'tweets',
+                  body: {
+                    from:0, size:3000,
+                    query: {
+                      match_all: {}
+                      
+                    },
+                  }
+                },function (error, response, status) {
+                    if (error){
+                      console.log("search error: "+error)
+                    }
+                    else {
+                      console.log("\n\n\n\n--- Response ---"+JSON.stringify(response.hits.hits.length));
+                      //res.end(JSON.stringify(response));
+                      console.log("--- Hits ---");
+                      cb(response.hits.hits);
+                   
+                     
+                    }
+                });
+},
+
+    tweets: function(keyword,cb) {
+      var overallResponse = {};
+      keywordGl=keyword;
+      var promise=new Promise(function(resolve, reject){
+      twitterClient.get('search/tweets', {q: keyword, count: 100}, function(err, data){
+        // console.log("success twitter"+ data.statuses);
+        console.log('\n\n\n\nResponse twitter length--->'+ data.statuses.length);
+        resolve(data.statuses);
+        });
+      });
+
+      promise.then( function(res){
+
+
+          var tweetObj = res;
+          var bulk = [];
               var makebulk = function(tweetObj,callback){
                   
                 for (var current in tweetObj){
@@ -50,30 +90,19 @@ module.exports = {
             makebulk(tweetObj,function(response){
               console.log("Bulk content prepared");
               indexall(response,function(response){
-                console.log("Prince Status is: "+JSON.stringify(response));
+                // console.log("Prince Status is: "+JSON.stringify(response));
                 
-                return response;
-              });
-            });
-},
-
-    tweets: function(keyword,cb) {
-      var overallResponse = {};
-      keywordGl=keyword;
-      var promise=new Promise(function(resolve, reject){
-      twitterClient.get('search/tweets', {q: keyword, count: 10}, function(err, data){
-        console.log("success twitter"+ data.statuses);
-        resolve(data.statuses);
-        });
-      });
-
-      promise.then( this.elasticStore ).then(function(){
-        client.search({
+                  console.log('keyword------>'+JSON.stringify(keywordGl));
+                  client.search({
                   index: 'twitter',
                   type: 'tweets',
                   body: {
+                    from:0, size:5000,
                     query: {
-                      match: { "keywords": keywordGl }
+                      regexp: { "text": ".+"+keywordGl+".+" },
+                      regexp: { "text": keywordGl+".+" },
+                      regexp: { "text": ".+"+keywordGl },
+                      regexp: { "text": keywordGl }
                       
                     },
                   }
@@ -82,7 +111,7 @@ module.exports = {
                       console.log("search error: "+error)
                     }
                     else {
-                      console.log("--- Response ---");
+                      console.log("\n\n\n\n--- Response ---"+JSON.stringify(response.hits.hits.length));
                       //res.end(JSON.stringify(response));
                       console.log("--- Hits ---");
                       cb(response.hits.hits);
@@ -90,8 +119,13 @@ module.exports = {
                      
                     }
                 });
-        
 
+                
+              });
+            });
+
+
+      
       });
       
     },
