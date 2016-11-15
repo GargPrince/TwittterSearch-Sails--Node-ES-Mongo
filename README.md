@@ -15,7 +15,7 @@ This is a Node JS app to demonstrate fetching of tweets from Twitter API and sto
 5. Start the server: `sails lift`
 6. Open homepage by visiting: `http://localhost:1337`
 
-Once everything is set up, we can fetch tweets from Twitter API and store in Elastic Search and Analytics in Mongo DB.
+Once everything is set up, we can fetch tweets from Twitter API storing them in Elastic Search and Analytics in Mongo DB.
 
 ## API endpoints
 
