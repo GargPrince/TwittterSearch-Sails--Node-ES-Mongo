@@ -1,4 +1,4 @@
-# TwittterSearch-Sails--Node-ES-Mongo
+# TwitterSearch-Sails--Node-ES-Mongo
 
 
 This is a Node JS app to demonstrate fetching of tweets from Twitter API and storing it in Elastic Search using sails.js.
