@@ -19,17 +19,17 @@ Once everything is set up, we can fetch tweets from Twitter API and store in Ela
 
 ## API endpoints
 
-1. To search Tweets by Twitter API
+1. To search Tweets using Twitter API
 
   -http://localhost:1337
   
   
-2. Return the number of tweets
+2. Returns number of tweets
 
   -http://localhost:1337/allTweetsAPICount
 
 
-3. Displays top ten people who tweeted most
+3. Displays top ten people or twitter handles who tweeted the most
 
   -http://localhost:1337/tenPeopleTwittedMost
 
@@ -44,7 +44,7 @@ Once everything is set up, we can fetch tweets from Twitter API and store in Ela
   -http://localhost:1337/leastRecentTweets
 
 
-6. Sort and display tweets by user who are having more followers
+6. Display user tweets sorted by number of followers
 
   -http://localhost:1337/sortByFollowers
 
