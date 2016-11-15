@@ -7,9 +7,10 @@ module.exports = {
   //Config for ES
     ESClient : new elasticsearch.Client({
     host: 'localhost:9200',
+    //only log something when it is an error or warning
    log : [{
     type: 'stdio',
-    levels: ['error', 'warning'] // change these options
+    levels: ['error', 'warning'] 
   }]
   }),
 
@@ -21,7 +22,7 @@ module.exports = {
   access_token_secret: 'iuD60sc1syw8YRahvLYTHJ5mutbgx7Ir55TlEBR3f9oU6'
 }),
 
-//Config for MongoDB
+//take reference to MongoClient to make queries
 MongoClient: mongodb.MongoClient
 
 

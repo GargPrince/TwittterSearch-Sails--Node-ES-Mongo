@@ -26,8 +26,10 @@ module.exports = {
                   index: 'twitter',
                   type: 'tweets',
                   body: {
+                    
                     //We defined the limit maximum records to be fetched from ES
                     from:0, size:5000, 
+                    
                     //query to get whole data inside index
                     query: {
                       match_all: {}
@@ -50,27 +52,30 @@ module.exports = {
       var overallResponse = {};
       keywordGl=keyword;
       var promise=new Promise(function(resolve, reject){
+        
         //query by keyword to twitter API and limit count to 50 but you can keep it till 100(further than that not allowed)
       twitterClient.get('search/tweets', {q: keyword, count: 50}, function(err, data){
         resolve(data.statuses);
         });
       });
-// Using promises instead of callbacks
+      
+      // Using promises instead of callbacks
       promise.then( function(res){
 
           var tweetObj = res;
           var bulk = [];
-              var makebulk = function(tweetObj,callback){
-          //pushing into array        
+              var makebulk = function(tweetObj,giveArray){
+          
+             //pushing into array        
                 for (var current in tweetObj){
                 bulk.push(
                   { index: {_index: 'twitter', _type: 'tweets', _id: tweetObj[current].id_str } }, JSON.stringify(tweetObj[current])
                 );
               }
-              callback(bulk);
+              giveArray(bulk);
             }
 
-            var indexall = function(madebulk,callback) {
+            var indexall = function(madebulk,giveItems) {
               esClient.bulk({
                 maxRetries: 5,
                 index: 'twitter',
@@ -81,20 +86,23 @@ module.exports = {
                     throw err;
                   }
                   else {
-                    callback(resp.items);
+                    giveItems(resp.items);
                   }
               });
             }
-// Calling makebulk to prepare our bulk array of JSON and query ES for bulk store by calling indexall()
+          
+          // Calling makebulk to prepare our bulk array of JSON and query ES for bulk store by calling indexall()
             makebulk(tweetObj,function(response){
               indexall(response,function(response){
                   esClient.search({
                   index: 'twitter',
                   type: 'tweets',
                   body: {
+                   
                     //We defined the limit maximum records to be fetched from ES
                     from:0, size:5000,
-                    //query by regexp to get different compbination of matching data for ES
+                   
+                    //query by regexp to get different compbination of matching data from text field in ES
                     query: {
                       regexp: { "text": ".+"+keywordGl+".+" },
                       regexp: { "text": keywordGl+".+" },
@@ -108,6 +116,7 @@ module.exports = {
                       throw error;
                     }
                     else {
+                     
                       //giving data by callback
                       dataByCallback(response.hits.hits);
                     }
@@ -119,7 +128,7 @@ module.exports = {
       
     },
 
-//Query to save data in MongoDB
+    //Query to save data in MongoDB
     mongoDBSave: function(keyword, tweetCount) {
       mongoClient.connect(url, function(err, db) {
         db.collection('tweetinfo').insertOne( {
@@ -132,7 +141,8 @@ module.exports = {
     
       });
     },
-//Query to find data form MongoDB
+    
+    //Query to find data form MongoDB
     showMongoData: function(mongoCallback) {
       mongoClient.connect(url, function(err, db) {
         db.collection('tweetinfo').find({}).toArray(function(err, items) {
@@ -146,6 +156,4 @@ module.exports = {
 
   }
 
-
-  
 };
